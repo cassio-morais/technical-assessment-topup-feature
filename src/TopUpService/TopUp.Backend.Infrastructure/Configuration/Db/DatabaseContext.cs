@@ -30,6 +30,7 @@ namespace Backend.TopUp.Infrastructure.Configuration.Db
                 builder.ToTable("top_up_beneficiaries");
                 builder.HasKey(x => x.Id);
                 builder.Property(x => x.Id).HasColumnName("id");
+                builder.HasIndex(x => x.UserId);
                 builder.Property(x => x.UserId).HasColumnName("user_id").IsRequired();
                 builder.Property(x => x.IsActive).HasColumnName("is_active").HasDefaultValue(false).IsRequired();
                 builder.Property(x => x.Nickname).HasColumnName("nickname").HasColumnType("VARCHAR(20)").IsRequired();
@@ -44,6 +45,7 @@ namespace Backend.TopUp.Infrastructure.Configuration.Db
                 builder.HasKey(x => x.Id);
                 builder.Property(x => x.Id).HasColumnName("id");
                 builder.Property(x => x.UserId).HasColumnName("user_id").IsRequired();
+                builder.HasIndex(x => x.UserId);
                 builder.HasOne(x => x.ToUpBeneficiary);
                 builder.Property(x => x.Amount).HasColumnName("amount").HasDefaultValue((decimal)0);
                 builder.Property(x => x.TransactionDate).HasColumnName("transaction_date").ValueGeneratedOnAdd().IsRequired();
