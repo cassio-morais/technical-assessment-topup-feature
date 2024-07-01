@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: topup_db
+    environment:
+      POSTGRES_USER: some_user
+      POSTGRES_PASSWORD: Example@Bad@Password!123
+      POSTGRES_DB: topup_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

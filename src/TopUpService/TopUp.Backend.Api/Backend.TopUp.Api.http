@@ -1,0 +1,11 @@
+# @TopUp.Backend_HostAddress = http://localhost:5298
+
+
+# POST {{TopUp.Backend_HostAddress}}/users/C30CF3C7-C738-435D-AC77-FA19B6018924/beneficiaries/
+# Accept: application/json
+# {
+#   "nickname": "brother cellphone",
+#   "phoneNumber": "+971-04-1234567"
+# }
+
+###
