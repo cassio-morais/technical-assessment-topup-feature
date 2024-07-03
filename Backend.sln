@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Solution Items", "3 - Solution Items", "{ABC08BA7-BCFC-4A14-A32C-46AC3623C51C}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - TopUpService", "1 - TopUpService", "{558DD819-471A-4F9C-BD43-975719F3F496}"
@@ -24,11 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backend.TopUp.Tests", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backend.Account.Api", "src\AccountService\Backend.Account.Api\Backend.Account.Api.csproj", "{1E746EB9-7CCD-48C7-B6CF-6ED29F10C338}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Account.Core", "src\AccountService\Backend.Account.Core\Backend.Account.Core.csproj", "{1AFD9A0F-8E56-4C15-B0B0-4466EB3D2EED}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - FakeUserService", "3 - FakeUserService", "{379B7921-328F-4F99-8395-984650F5BE16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.FakeUser", "src\FakeUserService\FakeUser.Backend\Backend.FakeUser.csproj", "{F3DC845D-8BC0-4206-BB58-76EDA587C086}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backend.FakeUser", "src\FakeUserService\FakeUser.Backend\Backend.FakeUser.csproj", "{F3DC845D-8BC0-4206-BB58-76EDA587C086}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,10 +59,6 @@ Global
 		{1E746EB9-7CCD-48C7-B6CF-6ED29F10C338}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E746EB9-7CCD-48C7-B6CF-6ED29F10C338}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E746EB9-7CCD-48C7-B6CF-6ED29F10C338}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1AFD9A0F-8E56-4C15-B0B0-4466EB3D2EED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1AFD9A0F-8E56-4C15-B0B0-4466EB3D2EED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1AFD9A0F-8E56-4C15-B0B0-4466EB3D2EED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1AFD9A0F-8E56-4C15-B0B0-4466EB3D2EED}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F3DC845D-8BC0-4206-BB58-76EDA587C086}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F3DC845D-8BC0-4206-BB58-76EDA587C086}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3DC845D-8BC0-4206-BB58-76EDA587C086}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -79,7 +74,6 @@ Global
 		{A3D7FB1A-02BE-4199-834F-576563B1B9FC} = {558DD819-471A-4F9C-BD43-975719F3F496}
 		{50CE2C00-BF48-43C3-AACB-ABFF2F11A74D} = {558DD819-471A-4F9C-BD43-975719F3F496}
 		{1E746EB9-7CCD-48C7-B6CF-6ED29F10C338} = {1D9E5CC1-0BE2-4C13-9C65-B9D55A92564D}
-		{1AFD9A0F-8E56-4C15-B0B0-4466EB3D2EED} = {1D9E5CC1-0BE2-4C13-9C65-B9D55A92564D}
 		{F3DC845D-8BC0-4206-BB58-76EDA587C086} = {379B7921-328F-4F99-8395-984650F5BE16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

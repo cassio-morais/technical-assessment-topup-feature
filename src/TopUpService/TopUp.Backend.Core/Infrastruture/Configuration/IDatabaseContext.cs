@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Backend.TopUp.Core.Contracts
+namespace Backend.TopUp.Core.Infrastruture.Configuration
 {
     // todo: move to Infrastructure/Configuration
     public interface IDatabaseContext : IDisposable

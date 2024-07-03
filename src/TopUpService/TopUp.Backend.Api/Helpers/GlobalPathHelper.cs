@@ -2,6 +2,6 @@
 {
     public class GlobalPathHelper
     {
-        public const string Pattern = "test/api/v{Version:apiVersion}/[controller]";
+        public const string Pattern = "/api/v{Version:apiVersion}/[controller]";
     }
 }

@@ -2,11 +2,11 @@
 
 namespace Backend.TopUp.Core.Api.Request
 {
-    public record AddBeneficiaryRequest(
-        [Required(ErrorMessage = "{0} can't not be null")]
+    public sealed record AddBeneficiaryRequest(
+        [Required(ErrorMessage = "{0} is required")]
         [MaxLength(20, ErrorMessage = "{0} maximum 15 characters")] 
-        string Nickname, 
-        [Required(ErrorMessage = "{0} can't not be null")]
-        [MaxLength(15, ErrorMessage = "{0} maximum 15 characters")]
+        string Nickname,
+        [Required(ErrorMessage = "{0} is required")]
+        [MaxLength(16, ErrorMessage = "{0} maximum 16 characters")]
         string PhoneNumber);
 }

@@ -1,4 +1,6 @@
-﻿namespace Backend.TopUp.Core.Entities
+﻿using System.Text.RegularExpressions;
+
+namespace Backend.TopUp.Core.Entities
 {
     public sealed class TopUpBeneficiary : BaseEntity<Guid>
     {
@@ -29,7 +31,34 @@
                 _nickname = value;
             }
         }
-        public string? PhoneNumber { get; private set; }
+
+        private string? _phoneNumber;
+
+        public string? PhoneNumber
+        {
+            get
+            {
+                return _phoneNumber;
+            }
+            private set
+            {
+                if (!IsValidUAEPhoneNumber(value))
+                    throw new Exception("Invalid UAE phone number");
+
+                _phoneNumber = value;
+            }
+        }
+
         public bool IsActive { get; private set; }
+
+        private bool IsValidUAEPhoneNumber(string? phoneNumber)
+        {
+            if (string.IsNullOrEmpty(phoneNumber))
+                return false;
+
+            var phonePattern = @"^\+971[-][0-9][0-9]([0-9])?[-]{1}[0-9]{7}$";
+
+            return Regex.IsMatch(phoneNumber, phonePattern);
+        }
     }
 }

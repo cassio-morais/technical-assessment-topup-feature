@@ -1,6 +1,6 @@
 ﻿namespace Backend.TopUp.Core.Api.Response
 {
-    public class TopUpBeneficiaryResponse
+    public sealed record TopUpBeneficiaryResponse
     {
         public TopUpBeneficiaryResponse(Guid id, string nickname, string phoneNumber, bool isActive)
         {

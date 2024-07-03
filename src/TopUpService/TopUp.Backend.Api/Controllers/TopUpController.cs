@@ -23,19 +23,21 @@ namespace Backend.TopUp.Api.Controllers
         /// <summary>
         /// Add beneficiary to an user
         /// </summary>
-        /// <param name="userId">User Id</param>
-        /// <param name="AddBeneficiaryRequest"> Beneficiary's phone number and nickname </param>
+        /// <remarks>
+        ///  Users: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
+        /// </remarks>
+        /// <param name="userId">User Id [real world this information could be retrieve from a JWT token]</param>
+        /// <param name="request"> Beneficiary's phone number and nickname </param>
         /// <response code="204"> </response>
         [HttpPost("users/{userId}/beneficiaries")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddBeneficiaryAsync([Required] Guid userId, [FromBody] AddBeneficiaryRequest request)
         {
-            // this endpoint could have a bulk operation with many beneficiaries, for example
             var result = await _topUpService.AddTopUpBeneficiaryAsync(userId,request);
 
             if (result.HasError)
-                return BadRequest(new BadRequestObjectResult(result.ErrorMessage));
+                return BadRequest(new ProblemDetails() { Title = result.ErrorMessage });
             
             return NoContent();
         }
@@ -44,23 +46,76 @@ namespace Backend.TopUp.Api.Controllers
         /// <summary>
         /// Show beneficiaries by user id
         /// </summary>
-        /// <param name="userId">User Id</param>
+        /// <remarks>
+        ///  Users: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
+        /// </remarks>
+        /// <param name="userId">User Id [real world this information could be retrieve from a JWT token] Examples to use: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)</param>
         /// <response code="204"> </response>
         [HttpGet("users/{userId}/beneficiaries")]
         [ProducesResponseType(typeof(TopUpBeneficiaryResponse),StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ListBeneficiariesAsync([Required] Guid userId)
         {
-            var result = await _topUpService.ListBeneficiariesByUserId(userId);
+            var result = await _topUpService.ListBeneficiariesByUserIdAsync(userId);
 
             if (result.HasError)
-                return BadRequest(new BadRequestObjectResult(result.ErrorMessage));
+                return BadRequest(new ProblemDetails() { Title = result.ErrorMessage });
 
             var response = result.Data!
                 .Select(x => new TopUpBeneficiaryResponse(x.Id, x.Nickname!, x.PhoneNumber!, x.IsActive))
                 .ToList();
 
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Show top-up options
+        /// </summary>
+        /// <remarks>
+        ///  Users: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
+        /// </remarks>
+        /// <param name="userId">User Id [real world this information could be retrieve from a JWT token] - Examples to use: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)</param>
+        /// <param name="currencyAbbreviation"> AED for the purpose this test </param>
+        /// <response code="204"> </response>
+        [HttpGet("users/{userId}/top-up")]
+        [ProducesResponseType(typeof(List<TopUpOptionResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ListTopUpOptionsAsync([Required] Guid userId,
+            [FromQuery(Name = "currency")][Required] string currencyAbbreviation)
+        {
+            var result = await _topUpService.ListTopUpOptionsByUserIdAsync(userId, currencyAbbreviation);
+
+            if (result.HasError)
+                return BadRequest(new ProblemDetails() { Title = result.ErrorMessage });
+
+            var response = result.Data!
+                .Select(x => new TopUpOptionResponse(x.Id, x.CurrencyAbbreviation!, x.Value!))
+                .OrderBy(x => x.Value)
+                .ToList();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Order a top-up 
+        /// </summary>
+        /// <remarks>
+        ///  Users: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
+        /// </remarks>
+        /// <param name="userId">User Id [real world this information could be retrieve from a JWT token]</param>
+        /// <param name="request"> beneficiary Id and top-up option Id </param>
+        /// <response code="204"> </response>
+        [HttpPost("users/{userId}/top-up")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RequestTopUpAsync([Required] Guid userId, [FromBody] TopUpRequest request)
+        {
+            var result = await _topUpService.RequestTopUpByUserId(userId, request);
+
+            if (result.HasError)
+                return BadRequest(new ProblemDetails() { Title = result.ErrorMessage });
+
+            return Ok(new { TransactionId = result.Data });
         }
     }
 }

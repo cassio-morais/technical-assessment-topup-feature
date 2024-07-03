@@ -6,7 +6,9 @@ namespace Backend.TopUp.Core.Application.Services
 {
     public interface ITopUpService
     {
-        Task<Result<Guid>> AddTopUpBeneficiaryAsync(Guid userId, AddBeneficiaryRequest beneficiary);
-        Task<Result<List<TopUpBeneficiary>>> ListBeneficiariesByUserId(Guid userId);
+        Task<Result<Guid>> AddTopUpBeneficiaryAsync(Guid userId, AddBeneficiaryRequest request);
+        Task<Result<List<TopUpBeneficiary>>> ListBeneficiariesByUserIdAsync(Guid userId);
+        Task<Result<List<TopUpOption>>> ListTopUpOptionsByUserIdAsync(Guid userId, string currencyAbbreviation);
+        Task<Result<Guid>> RequestTopUpByUserId(Guid userId, TopUpRequest request);
     }
 }
