@@ -58,11 +58,6 @@ namespace Backend.TopUp.Infrastructure.Configuration.Db
             base.OnModelCreating(modelBuilder);
         }
 
-        
-        // todo: put this connection string in the properly place 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-                => optionsBuilder.UseNpgsql(@"Host=localhost;Username=some_user;Password=Example@Bad@Password!123;Database=topup_db");
-
         public Task<int> SaveChangesAsync()
         {
             return base.SaveChangesAsync();

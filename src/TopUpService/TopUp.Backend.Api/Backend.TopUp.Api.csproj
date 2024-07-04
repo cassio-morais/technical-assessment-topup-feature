@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -18,7 +18,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 	<PackageReference Include="Refit" Version="7.1.2" />
   </ItemGroup>
-
+	
+  <PropertyGroup>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+  </PropertyGroup>
+	
   <ItemGroup>
     <ProjectReference Include="..\TopUp.Backend.Application\Backend.TopUp.Application.csproj" />
     <ProjectReference Include="..\TopUp.Backend.Infrastructure\Backend.TopUp.Infrastructure.csproj" />

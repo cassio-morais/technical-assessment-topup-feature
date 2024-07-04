@@ -16,22 +16,32 @@ using Refit;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.TopUp.Api.Configuration
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddCustomDependencyInjection(this IServiceCollection services) 
+        // todo: split all this configuration in dependency injection extension classes
+        public static IServiceCollection AddCustomDependencyInjection(this IServiceCollection services, IConfiguration configuration) 
         {
-            // todo: split all this configuration in dependency injection extension classes
-            services.AddDbContext<DatabaseContext>();
+            
+            services.AddDbContext<DatabaseContext>(options => 
+                options.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTION_STRING")
+                    ?? configuration.GetConnectionString("postgres") // just for Apply migrations locally
+                    ?? throw new InvalidOperationException("Connection string 'postgres' not found.")));
+            
             services.AddScoped<IDatabaseContext, DatabaseContext>();
+
             services.AddScoped<ITopUpService, TopUpService>();
+
             services.AddScoped<ITopUpBeneficiaryRepository, TopUpBeneficiaryRepository>();
             services.AddScoped<ITopUpOptionRepository, TopUpOptionRepository>();
             services.AddScoped<ITopUpTransactionRepository, TopUpTransactionRepository>();
+
             services.AddScoped<IUserWebService, UserWebService>();
             services.AddScoped<IBankAccountWebService, BankAccountWebService>();
+
             services.AddScoped<IDateTimeExtensions, DateTimeExtensions>();
 
             services.AddRefitClient<IBankAccountApi>().ConfigureHttpClient(c =>

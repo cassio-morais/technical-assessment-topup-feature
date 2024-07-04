@@ -5,8 +5,11 @@ VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Solution Items", "3 - Solution Items", "{ABC08BA7-BCFC-4A14-A32C-46AC3623C51C}"
 	ProjectSection(SolutionItems) = preProject
+		.env = .env
 		docker-compose.yml = docker-compose.yml
+		AccountService.Dockerfile = AccountService.Dockerfile
 		README.md = README.md
+		TopUpService.Dockerfile = TopUpService.Dockerfile
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - TopUpService", "1 - TopUpService", "{558DD819-471A-4F9C-BD43-975719F3F496}"

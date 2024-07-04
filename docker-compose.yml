@@ -1,6 +1,35 @@
 version: '3'
 
 services:
+  top_up_api:
+    build:
+      context: .
+      dockerfile: ./TopUpService.Dockerfile
+    image: top-up-api:latest
+    container_name: top_up_api
+    ports:
+    - 8080:8080
+    networks:
+    - backend-network
+    depends_on: 
+    - db
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    - CONNECTION_STRING=Host=db;Username=some_user;Password=Example@Bad@Password!123;Database=topup_db
+  account_api:
+    build:
+      context: .
+      dockerfile: ./AccountService.Dockerfile
+    image: account-api:latest
+    container_name: account_api
+    ports:
+    - 8082:8082
+    networks:
+    - backend-network
+    depends_on: 
+    - db
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
   db:
     image: postgres:latest
     container_name: topup_db
@@ -12,6 +41,12 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+    - backend-network
 
 volumes:
   postgres_data:
+
+networks:
+    backend-network:
+        driver: bridge
