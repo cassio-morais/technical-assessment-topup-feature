@@ -4,7 +4,7 @@
 
 
 ## Design (TopUpService)
- - A simple 3 layer archtecture inspired by the tenants of Onion Archtecture (is not "by the book", it's just a 'inspiration')
+ - A simple 3 layer archtecture inspired by the 4 tenets of Onion Archtecture (is not "by the book", it's just a 'inspiration')
  - ![image](https://github.com/cassio-morais/technical-assessment-topup-feature/assets/63246083/4f21c3e7-88e5-438d-958e-4d610a7f6805)
  - Ref: https://jeffreypalermo.com/2013/08/onion-architecture-part-4-after-four-years/
  - ps: I like this approach. It's simple but it's interfaces oriented and has great testability. 
