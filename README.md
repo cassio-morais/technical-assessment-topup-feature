@@ -5,7 +5,7 @@
  - Browse to the project root directory  
  - Run `docker-compose up -d`
  - Swagger (TopUpService): http://localhost:8080/swagger/index.html
- - Swagger (AccountService): http://localhost:8080/swagger/index.html (just an account simulation)
+ - Swagger (AccountService): http://localhost:8082/swagger/index.html (just an bank account simulation)
 
 ## Problem Solution 
  - Big Picture
