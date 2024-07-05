@@ -23,7 +23,7 @@ namespace Backend.Account.Api.Controllers
             var number = rnd.Next(1, 10);
 
             if (number <= 2)
-                return BadRequest(new ProblemDetails() { Title = "Error during withdraw from balance request" });
+                return BadRequest(new ProblemDetails() { Title = "Insuficient funds" });
 
             return Ok(new BalanceWithdrawlResponse(Guid.NewGuid()));
         }
