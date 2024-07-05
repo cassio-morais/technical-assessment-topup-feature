@@ -18,6 +18,8 @@
  - ps: I like this approach. It's simple but it's interfaces oriented and has great testability. 
 
 ## Disclaimers:
+ - I put more effort in top-up service. Account and user service are just simulations
+ - In real world, solutions like this need more unit tests and integration tests.
  - There are comments in code (to explain some of my point of views in real world solutions)
  - There are so many challenges in a real world solution like these: 
 	- Distributed transactions (Saga Pattern or something)
