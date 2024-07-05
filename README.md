@@ -1,7 +1,11 @@
 # TopUp Feature
 
-## How to run the test:
-
+## How to run:
+ - Install Docker and Docker Compose
+ - Browse to the project root directory  
+ - Run `docker-compose up -d`
+ - Swagger (TopUpService): http://localhost:8080/swagger/index.html
+ - Swagger (AccountService): http://localhost:8080/swagger/index.html (just an account simulation)
 
 ## Design (TopUpService)
  - A simple 3 layer archtecture inspired by the 4 tenets of Onion Archtecture (is not "by the book", it's just a 'inspiration')
