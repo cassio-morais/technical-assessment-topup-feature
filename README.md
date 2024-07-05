@@ -19,7 +19,7 @@
 
 ## Disclaimers:
  - There are comments in code (to explain some of my point of views in real world solutions)
- - There are so many challenges in a real world solution like this: 
+ - There are so many challenges in a real world solution like these: 
 	- Distributed transactions (Saga Pattern or something)
 	- Distributed locks
 	- Commit and Rollback actions
