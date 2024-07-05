@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Backend.TopUp.Core.Entities
+﻿namespace Backend.TopUp.Core.Entities
 {
     public sealed class TopUpTransaction : BaseEntity<Guid>
     {

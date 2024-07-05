@@ -1,6 +1,4 @@
-﻿using Backend.TopUp.Core.Contracts;
-
-namespace Backend.TopUp.Core.Application
+﻿namespace Backend.TopUp.Core.Application
 {
     // these rules could be in a database table like "top_up_rules"
     // or something so that can be changed by a backoffice system

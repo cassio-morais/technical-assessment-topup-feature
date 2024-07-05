@@ -12,13 +12,13 @@ namespace Backend.TopUp.Infrastructure.Repositories
         private readonly IDatabaseContext _context = context;
         private readonly DbSet<TopUpOption> _options = context.Set<TopUpOption>();
 
-        public async Task<Result<TopUpOption>> GetTopUpOptionById(Guid id)
+        public async Task<Result<TopUpOption>> GetTopUpOptionById(Guid id, bool isActive = true)
         {
             try
             {
                 var result = await _options
                      .AsNoTracking()
-                     .SingleOrDefaultAsync(x => x.Id == id);
+                     .SingleOrDefaultAsync(x => x.Id == id &&  x.IsActive == isActive);
 
                 if (result is null)
                     return Result<TopUpOption>.Error("Top-up option doesn't exist");

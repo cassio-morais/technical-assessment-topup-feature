@@ -43,7 +43,7 @@ namespace Backend.TopUp.Core.Entities
             private set
             {
                 if (!IsValidUAEPhoneNumber(value))
-                    throw new Exception("Invalid UAE phone number");
+                    throw new Exception("Invalid UAE phone number"); 
 
                 _phoneNumber = value;
             }

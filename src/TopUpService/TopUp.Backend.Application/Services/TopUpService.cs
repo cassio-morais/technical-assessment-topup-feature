@@ -15,22 +15,33 @@ namespace Backend.TopUp.Application.Services
     // this class can be huge in some cases...
     // so we can divide it into classes by usecase, for example, or 
     // we can use some approach like CQRS... any others 
-    public class TopUpService(
-        ITopUpBeneficiaryRepository topUpBeneficiaryRepository, 
-        ITopUpOptionRepository topUpOptionRepository,
-        ITopUpTransactionRepository topUpTransactionRepository,
-        IUserWebService userWebService,
-        IBankAccountWebService accountWebService,
-        IDateTimeExtensions dateTimeExtensions,
-        IBus bus) : ITopUpService
+    public class TopUpService : ITopUpService
     {
-        private readonly ITopUpBeneficiaryRepository _beneficiaryRepository = topUpBeneficiaryRepository;
-        private readonly IUserWebService _userWebService = userWebService;
-        private readonly IBankAccountWebService _accountWebService = accountWebService;
-        private readonly IDateTimeExtensions _dateTimeExtensions = dateTimeExtensions;
-        private readonly ITopUpOptionRepository _topUpOptionRepository = topUpOptionRepository;
-        private readonly ITopUpTransactionRepository _topUpTransactionRepository = topUpTransactionRepository;
-        private readonly IBus _bus = bus;
+        private readonly ITopUpBeneficiaryRepository _beneficiaryRepository;
+        private readonly IUserWebService _userWebService;
+        private readonly IBankAccountWebService _accountWebService;
+        private readonly IDateTimeExtensions _dateTimeExtensions;
+        private readonly ITopUpOptionRepository _topUpOptionRepository;
+        private readonly ITopUpTransactionRepository _topUpTransactionRepository;
+        private readonly IBus _bus;
+
+        public TopUpService(
+            ITopUpBeneficiaryRepository topUpBeneficiaryRepository, 
+            ITopUpOptionRepository topUpOptionRepository,
+            ITopUpTransactionRepository topUpTransactionRepository,
+            IUserWebService userWebService,
+            IBankAccountWebService accountWebService,
+            IDateTimeExtensions dateTimeExtensions,
+            IBus bus)
+        {
+            _beneficiaryRepository = topUpBeneficiaryRepository;
+            _userWebService = userWebService;
+            _accountWebService = accountWebService;
+            _dateTimeExtensions = dateTimeExtensions;
+            _topUpOptionRepository = topUpOptionRepository;
+            _topUpTransactionRepository = topUpTransactionRepository;
+            _bus = bus;
+        }
 
         public async Task<Result<Guid>> AddTopUpBeneficiaryAsync(Guid userId, AddBeneficiaryRequest request)
         {
