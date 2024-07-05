@@ -48,7 +48,7 @@ public class TopUpServiceTests
     }
 
     [Fact]
-    public async Task RequestTopUpByUserIdAsync_UserDoesNotExist_ReturnsError()
+    public async Task RequestTopUpByUserIdAsync_ShouldReturnsError_WhenUserDoesNotExist()
     {
         // Arrange
         var service = CreateService();
@@ -67,7 +67,7 @@ public class TopUpServiceTests
     }
 
     [Fact]
-    public async Task RequestTopUpByUserIdAsync_CreatePendingTransactionFails_ReturnsError()
+    public async Task RequestTopUpByUserIdAsync_ShouldReturnsError_WhenCreatePendingTransactionFails()
     {
         // Arrange
         var service = CreateService();
@@ -93,7 +93,7 @@ public class TopUpServiceTests
     }
 
     [Fact]
-    public async Task RequestTopUpByUserIdAsync_WithdrawBalanceFails_ReturnsError()
+    public async Task RequestTopUpByUserIdAsync_ShouldReturnsError_WithdrawBalanceFails()
     {
         // Arrange
         var service = CreateService();
@@ -129,7 +129,7 @@ public class TopUpServiceTests
     }
 
     [Fact]
-    public async Task RequestTopUpByUserIdAsync_CompletesTopUpTransactionFails_ReturnsError()
+    public async Task RequestTopUpByUserIdAsync_ShouldReturnsError_CompletesTopUpTransactionFails()
     {
         // Arrange
         var service = CreateService();
@@ -168,7 +168,7 @@ public class TopUpServiceTests
     }
 
     [Fact]
-    public async Task RequestTopUpByUserIdAsync_Success_ReturnsTopUpTransactionId()
+    public async Task RequestTopUpByUserIdAsync_ShouldReturnsTopUpTransactionId_Success()
     {
         // Arrange
         var service = CreateService();
