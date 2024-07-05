@@ -2,6 +2,8 @@
 
 namespace Backend.Account.Api.Controllers
 {
+    // **THIS CLASS IS JUST A SIMULATION**
+
     [ApiController]
     [ApiVersion("1.0")]
     [Route("/api/v{Version:apiVersion}/[controller]")]
@@ -12,10 +14,10 @@ namespace Backend.Account.Api.Controllers
         /// </summary>
         /// <param name="request"> withdraw from balance request </param>
         /// <response code="204"> </response>
-        [HttpPost("balance")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [HttpPost("balance/withdrawl")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult WithdrawFromBalanceAsync([FromBody] WithdrawFromBalanceRequest request)
+        public IActionResult WithdrawBalanceAsync([FromBody] BalanceWithdrawlRequest request)
         {
             Random rnd = new Random();
             var number = rnd.Next(1, 10);
@@ -23,9 +25,10 @@ namespace Backend.Account.Api.Controllers
             if (number <= 2)
                 return BadRequest(new ProblemDetails() { Title = "Error during withdraw from balance request" });
 
-            return NoContent();
+            return Ok(new BalanceWithdrawlResponse(Guid.NewGuid()));
         }
 
-        public record WithdrawFromBalanceRequest(Guid UserId, decimal Amount, Guid ExternalTransactionId);
+        public record BalanceWithdrawlRequest(Guid UserId, decimal Amount, Guid ExternalTransactionId);
+        public record BalanceWithdrawlResponse(Guid BalanceWithdrawTransactionId);
     }
 }

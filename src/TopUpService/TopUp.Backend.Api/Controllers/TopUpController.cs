@@ -12,7 +12,8 @@ namespace Backend.TopUp.Api.Controllers
     [Route(GlobalPathHelper.Pattern)]
     public class TopUpController : ControllerBase
     {
-        // TODO: improve controller documentation
+        // todo: improve controller documentation
+        // todo: put some log here
 
         private readonly ITopUpService _topUpService;
         public TopUpController(ITopUpService topUpService)
@@ -24,9 +25,11 @@ namespace Backend.TopUp.Api.Controllers
         /// Add beneficiary to an user
         /// </summary>
         /// <remarks>
-        ///  Users: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
+        ///  UserId's: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)  <br /> 
+        ///  Phone Number example: +971-04-1234567  <br /> 
+        ///  Nickname example: John Doe Phone
         /// </remarks>
-        /// <param name="userId">User Id [real world this information could be retrieve from a JWT token]</param>
+        /// <param name="userId">User Id [real world this information could be retrieved from a JWT token]</param>
         /// <param name="request"> Beneficiary's phone number and nickname </param>
         /// <response code="204"> </response>
         [HttpPost("users/{userId}/beneficiaries")]
@@ -47,9 +50,9 @@ namespace Backend.TopUp.Api.Controllers
         /// Show beneficiaries by user id
         /// </summary>
         /// <remarks>
-        ///  Users: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
+        ///  UserId's: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
         /// </remarks>
-        /// <param name="userId">User Id [real world this information could be retrieve from a JWT token] Examples to use: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)</param>
+        /// <param name="userId">User Id [real world this information could be retrieved from a JWT token]</param>
         /// <response code="204"> </response>
         [HttpGet("users/{userId}/beneficiaries")]
         [ProducesResponseType(typeof(TopUpBeneficiaryResponse),StatusCodes.Status200OK)]
@@ -72,10 +75,10 @@ namespace Backend.TopUp.Api.Controllers
         /// Show top-up options
         /// </summary>
         /// <remarks>
-        ///  Users: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
+        ///  UserId's: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
         /// </remarks>
-        /// <param name="userId">User Id [real world this information could be retrieve from a JWT token] - Examples to use: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)</param>
-        /// <param name="currencyAbbreviation"> AED for the purpose this test </param>
+        /// <param name="userId">User Id [real world this information could be retrieved from a JWT token]</param>
+        /// <param name="currencyAbbreviation"> use AED for this test </param>
         /// <response code="204"> </response>
         [HttpGet("users/{userId}/top-up")]
         [ProducesResponseType(typeof(List<TopUpOptionResponse>), StatusCodes.Status200OK)]
@@ -100,9 +103,9 @@ namespace Backend.TopUp.Api.Controllers
         /// Order a top-up 
         /// </summary>
         /// <remarks>
-        ///  Users: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
+        ///  UserId's: C30CF3C7-C738-435D-AC77-FA19B6018924 (verified), 29C0F3B9-75C1-4A80-8530-BA295A612B67 (unverified)
         /// </remarks>
-        /// <param name="userId">User Id [real world this information could be retrieve from a JWT token]</param>
+        /// <param name="userId">User Id [real world this information could be retrieved from a JWT token]</param>
         /// <param name="request"> beneficiary Id and top-up option Id </param>
         /// <response code="204"> </response>
         [HttpPost("users/{userId}/top-up")]
@@ -110,7 +113,7 @@ namespace Backend.TopUp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RequestTopUpAsync([Required] Guid userId, [FromBody] TopUpRequest request)
         {
-            var result = await _topUpService.RequestTopUpByUserId(userId, request);
+            var result = await _topUpService.RequestTopUpByUserIdAsync(userId, request);
 
             if (result.HasError)
                 return BadRequest(new ProblemDetails() { Title = result.ErrorMessage });

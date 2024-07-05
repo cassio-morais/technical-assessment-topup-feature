@@ -11,7 +11,7 @@ namespace Backend.TopUp.Infrastructure.Repositories
         private readonly IDatabaseContext _context = context;
         private readonly DbSet<TopUpTransaction> _transactions = context.Set<TopUpTransaction>();
 
-        public async Task<Result<Guid>> CreateTopUpTransaction(TopUpTransaction topUpTransaction)
+        public async Task<Result<Guid>> CreateTopUpTransactionAsync(TopUpTransaction topUpTransaction)
         {
             try
             {
@@ -22,27 +22,28 @@ namespace Backend.TopUp.Infrastructure.Repositories
             }
             catch (Exception)
             {
-                // todo: LOG
+                // todo: put some log here
                 return Result<Guid>.Error("An error ocurred");
             }
         }
 
-        public async Task<Result<List<TopUpTransaction>>> ListTopUpTransactionsByUserIdWithinAPeriod(Guid id, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<Result<List<TopUpTransaction>>> ListTopUpTransactionsByUserIdWithinAPeriodAsync(Guid id, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             try
             {
                  return Result<List<TopUpTransaction>>.Ok(await _transactions
+                    .AsNoTracking()
                     .Where(x => x.TransactionDate >= startDate && x.TransactionDate <= endDate)
                     .ToListAsync());
             }
             catch (Exception ex)
             {
-                // todo: LOG
+                // todo: put some log here
                 return Result<List<TopUpTransaction>>.Error("An error ocurred");
             }
         }
 
-        public async Task<Result<Guid>> UpdateTopUpTransactionStatus(Guid topUpTransactionId,TopUpTransactionStatus topUpTransactionStatus, string? reason = null)
+        public async Task<Result<Guid>> UpdateTopUpTransactionStatusAsync(Guid topUpTransactionId,TopUpTransactionStatus topUpTransactionStatus, string? reason = null)
         {
             try
             {
@@ -54,13 +55,13 @@ namespace Backend.TopUp.Infrastructure.Repositories
                 transaction.UpdateStatus(topUpTransactionStatus, reason);
                 
                 _transactions.Update(transaction);
-                await _context.SaveChangesAsync();  
+                await _context.SaveChangesAsync();
 
                 return Result<Guid>.Ok(transaction.Id);
             }
             catch (Exception)
             {
-                // todo: LOG
+                // todo: put some log here
                 return Result<Guid>.Error("An error ocurred");
             }
         }

@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+
   top_up_api:
     build:
       context: .
@@ -13,9 +14,16 @@ services:
     - backend-network
     depends_on: 
     - db
+    - rabbit_mq
     environment:
     - ASPNETCORE_ENVIRONMENT=Development
     - CONNECTION_STRING=Host=db;Username=some_user;Password=Example@Bad@Password!123;Database=topup_db
+    - RABBIT_MQ_HOST=rabbit_mq
+    - RABBIT_MQ_USER=guest
+    - RABBIT_MQ_PASS=guest
+    - ACCOUNT_API_BASE_ADDRESS=http://account_api
+    - ACCOUNT_API_PORT=8082
+
   account_api:
     build:
       context: .
@@ -28,8 +36,10 @@ services:
     - backend-network
     depends_on: 
     - db
+    - rabbit_mq
     environment:
     - ASPNETCORE_ENVIRONMENT=Development
+
   db:
     image: postgres:latest
     container_name: topup_db
@@ -44,8 +54,23 @@ services:
     networks:
     - backend-network
 
+  rabbit_mq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+    - backend-network
+
 volumes:
   postgres_data:
+  rabbitmq_data:
 
 networks:
     backend-network:

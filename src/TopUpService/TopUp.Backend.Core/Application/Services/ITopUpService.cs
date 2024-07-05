@@ -9,6 +9,6 @@ namespace Backend.TopUp.Core.Application.Services
         Task<Result<Guid>> AddTopUpBeneficiaryAsync(Guid userId, AddBeneficiaryRequest request);
         Task<Result<List<TopUpBeneficiary>>> ListBeneficiariesByUserIdAsync(Guid userId);
         Task<Result<List<TopUpOption>>> ListTopUpOptionsByUserIdAsync(Guid userId, string currencyAbbreviation);
-        Task<Result<Guid>> RequestTopUpByUserId(Guid userId, TopUpRequest request);
+        Task<Result<Guid>> RequestTopUpByUserIdAsync(Guid userId, TopUpRequest request);
     }
 }

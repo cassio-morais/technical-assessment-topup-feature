@@ -17,20 +17,21 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
+using Backend.TopUp.Core.Messages;
 
 namespace Backend.TopUp.Api.Configuration
 {
     public static class DependencyInjection
     {
-        // todo: split all this configuration in dependency injection extension classes
+        // todo: split all this configuration in separeted D.I. extension classes like this
         public static IServiceCollection AddCustomDependencyInjection(this IServiceCollection services, IConfiguration configuration) 
-        {
-            
+        {          
             services.AddDbContext<DatabaseContext>(options => 
-                options.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTION_STRING")
-                    ?? configuration.GetConnectionString("postgres") // just for Apply migrations locally
-                    ?? throw new InvalidOperationException("Connection string 'postgres' not found.")));
-            
+                options.UseNpgsql(GetFromEnvOrConfig("CONNECTION_STRING", "ConnectionStrings:postgres", configuration)));
+
+            services.AddRouting(opt => opt.LowercaseUrls = true);
+
             services.AddScoped<IDatabaseContext, DatabaseContext>();
 
             services.AddScoped<ITopUpService, TopUpService>();
@@ -46,7 +47,9 @@ namespace Backend.TopUp.Api.Configuration
 
             services.AddRefitClient<IBankAccountApi>().ConfigureHttpClient(c =>
             {
-                c.BaseAddress = new Uri("http://localhost:5045/");
+                c.BaseAddress = new Uri(
+                    GetFromEnvOrConfig("ACCOUNT_API_BASE_ADDRESS", "accountApi:baseAddress", configuration) + ":" + GetFromEnvOrConfig("ACCOUNT_API_PORT", "accountApi:port", configuration));
+                
             });
 
             services.ConfigureOptions<ConfigureSwaggerOptions>();
@@ -98,8 +101,29 @@ namespace Backend.TopUp.Api.Configuration
                 setup.SubstituteApiVersionInUrl = true;
             });
 
+            services.AddMassTransit(x =>
+            {
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(GetFromEnvOrConfig("RABBIT_MQ_HOST", "rabbitmq:host", configuration), "/", 
+                        h => {
+                            h.Username(GetFromEnvOrConfig("RABBIT_MQ_USER", "rabbitmq:user", configuration));
+                            h.Password(GetFromEnvOrConfig("RABBIT_MQ_PASS", "rabbitmq:pass", configuration));
+                    });
+
+                    cfg.Message<TopUpTransactionFailed>(x => x.SetEntityName("topup:transaction:failed"));
+
+                    cfg.ConfigureEndpoints(context);
+                });
+            });
+
             return services;
         }
+
+        public static string GetFromEnvOrConfig(string envVar, string appSettingsPath, IConfiguration configuration)
+            => Environment.GetEnvironmentVariable(envVar)
+                        ?? configuration[appSettingsPath]
+                        ?? throw new InvalidOperationException("It was not possible to retrieve some configuration");
 
         public class ConfigureSwaggerOptions : IConfigureNamedOptions<SwaggerGenOptions>
         {

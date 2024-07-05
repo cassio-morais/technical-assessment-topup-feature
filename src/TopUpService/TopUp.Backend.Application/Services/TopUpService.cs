@@ -7,18 +7,22 @@ using Backend.TopUp.Core.Extensions;
 using Backend.TopUp.Core.Infrastruture.Repositories;
 using Backend.TopUp.Core.Infrastruture.WebServices;
 using Backend.TopUp.Core.Infrastruture.WebServices.Response;
+using Backend.TopUp.Core.Messages;
+using MassTransit;
 
 namespace Backend.TopUp.Application.Services
 {
-    // this class can be split into classes by usecase, for example, or 
-    // we can use some approach like CQS... any others 
+    // this class can be huge in some cases...
+    // so we can divide it into classes by usecase, for example, or 
+    // we can use some approach like CQRS... any others 
     public class TopUpService(
         ITopUpBeneficiaryRepository topUpBeneficiaryRepository, 
         ITopUpOptionRepository topUpOptionRepository,
         ITopUpTransactionRepository topUpTransactionRepository,
         IUserWebService userWebService,
         IBankAccountWebService accountWebService,
-        IDateTimeExtensions dateTimeExtensions) : ITopUpService
+        IDateTimeExtensions dateTimeExtensions,
+        IBus bus) : ITopUpService
     {
         private readonly ITopUpBeneficiaryRepository _beneficiaryRepository = topUpBeneficiaryRepository;
         private readonly IUserWebService _userWebService = userWebService;
@@ -26,33 +30,30 @@ namespace Backend.TopUp.Application.Services
         private readonly IDateTimeExtensions _dateTimeExtensions = dateTimeExtensions;
         private readonly ITopUpOptionRepository _topUpOptionRepository = topUpOptionRepository;
         private readonly ITopUpTransactionRepository _topUpTransactionRepository = topUpTransactionRepository;
+        private readonly IBus _bus = bus;
 
         public async Task<Result<Guid>> AddTopUpBeneficiaryAsync(Guid userId, AddBeneficiaryRequest request)
         {
             var fakeUserExists = UserExists(userId);
-
-            if (fakeUserExists.HasError)
+            if (fakeUserExists.HasError) // todo: put some log here
                 return Result<Guid>.Error(fakeUserExists.ErrorMessage!);
 
             // from here to AddTopUpBeneficiaryAsync function we can assume some concurrency,
             // but I'm optimistic about it :)
             var beneficiariesResult = await _beneficiaryRepository.ListTopUpBeneficiariesAsync(x => x.UserId == userId);
-
-            if (beneficiariesResult.HasError) // todo: LOG
+            if (beneficiariesResult.HasError) // todo: put some log here
                 return Result<Guid>.Error("some error ocurred");
-
-            if (beneficiariesResult.Data!.Count >= TopUpRules.TopUpBeneficiariesLimitPerUser)  // todo: LOG
+            if (beneficiariesResult.Data!.Count >= TopUpRules.TopUpBeneficiariesLimitPerUser)  // todo: put some log here
                 return Result<Guid>.Error($"You have reached the top-up beneficiaries limit: {TopUpRules.TopUpBeneficiariesLimitPerUser}");
 
             var beneficiaryAlreadyExists = beneficiariesResult.Data.Any(x => x.Nickname == request.Nickname || x.PhoneNumber == request.PhoneNumber);
-            if (beneficiaryAlreadyExists)
+            if (beneficiaryAlreadyExists) // todo: put some log here
                 return Result<Guid>.Error("The top-up beneficiary already exists");
 
             var topUpBeneficiary = new TopUpBeneficiary(userId, request.Nickname, request.PhoneNumber, true);
-
             var result = await _beneficiaryRepository.AddTopUpBeneficiaryAsync(topUpBeneficiary);
 
-            if (result.HasError)  // todo: LOG
+            if (result.HasError)  // todo: put some log here
                 return Result<Guid>.Error("some error ocurred");
 
             return result;
@@ -61,8 +62,7 @@ namespace Backend.TopUp.Application.Services
         public async Task<Result<List<TopUpBeneficiary>>> ListBeneficiariesByUserIdAsync(Guid userId)
         {
             var fakeUserExists = UserExists(userId);
-
-            if (fakeUserExists.HasError)
+            if (fakeUserExists.HasError) // todo: put some log here
                 return Result<List<TopUpBeneficiary>>.Error(fakeUserExists.ErrorMessage!);
 
             return await _beneficiaryRepository.ListTopUpBeneficiariesAsync(x => x.UserId == userId);
@@ -71,109 +71,131 @@ namespace Backend.TopUp.Application.Services
         public async Task<Result<List<TopUpOption>>> ListTopUpOptionsByUserIdAsync(Guid userId, string currencyAbbreviation)
         {
             var fakeUserExists = UserExists(userId);
-
-            if (fakeUserExists.HasError) // todo: log
+            if (fakeUserExists.HasError) // todo: put some log here
                 return Result<List<TopUpOption>>.Error(fakeUserExists.ErrorMessage!);
-
-            if (currencyAbbreviation == null) // todo: LOG
+            if (currencyAbbreviation == null) // todo: put some log here
                 return Result<List<TopUpOption>>.Error("Currency abbreviation value required");
 
             var result = await _topUpOptionRepository.ListTopUpOptionsAsync(x => x.IsActive && x.CurrencyAbbreviation == currencyAbbreviation);
-
-            if(!result.Data!.Any()) // todo: LOG
+            if(!result.Data!.Any()) // todo: put some log here
                 return Result<List<TopUpOption>>.Error("Currency abbreviation doesn't exist");
 
             return result;
         }
 
-        public async Task<Result<Guid>> RequestTopUpByUserId(Guid userId, TopUpRequest request)
+        public async Task<Result<Guid>> RequestTopUpByUserIdAsync(Guid userId, TopUpRequest request)
         {
             var fakeUserResult = GetUserInfo(userId);
-            if (fakeUserResult.HasError)
+            if (fakeUserResult.HasError) // todo: put some log here
                 return Result<Guid>.Error(fakeUserResult.ErrorMessage!);
-            
             var fakeUser = fakeUserResult.Data;
 
             // from here, may we need some distributed lock to guarantee consistency
             var pendingTransactionResult = await CreatePendingTopUpTransaction(request, fakeUser);
-
-            if (pendingTransactionResult.HasError)
+            if (pendingTransactionResult.HasError) // todo: put some log here
                 return Result<Guid>.Error(pendingTransactionResult.ErrorMessage!);
+            var (topUpTransactionId, topUpValue) = pendingTransactionResult.Data!;
 
-            var (transactionId, topUpValue) = pendingTransactionResult.Data!;
-            var withdrawResult = await _accountWebService.WithdrawFromBalance(fakeUser!.UserId, topUpValue, transactionId);
+            var balanceWithdrawlResult = await _accountWebService.WithdrawBalanceAsync(fakeUser!.UserId, topUpValue, topUpTransactionId);
+            if (balanceWithdrawlResult.HasError) // todo: put some log here
+                return Result<Guid>.Error(balanceWithdrawlResult.ErrorMessage!);
+            var balanceWithdrawlTransactionId = balanceWithdrawlResult.Data!.BalanceWithdrawlTransactionId;
 
-            if (withdrawResult.HasError)
+            return await CompletesTopUpTransaction(userId, topUpTransactionId, topUpValue, balanceWithdrawlTransactionId);
+        }
+
+        private async Task<Result<Guid>> CompletesTopUpTransaction(Guid userId, Guid topUpTransactionId, decimal topUpValue, Guid balanceWithdrawlTransactionId)
+        {
+            var updateTopUpTransactionResult = await _topUpTransactionRepository.UpdateTopUpTransactionStatusAsync(topUpTransactionId, TopUpTransactionStatus.Success);
+
+            if (updateTopUpTransactionResult.HasError)
             {
-                // todo: here we can publish an event in a queue to accountWebService to refund money and to this service to set status transaction to error
-                return Result<Guid>.Error(withdrawResult.ErrorMessage!);
+                // todo: put some log here
+                // here we publish an event in a queue to accountWebService to subscribe
+                // and set its withdrawl transaction to NotOk and refund money to the user
+                await _bus.Publish(new TopUpTransactionFailed(
+                    userId,
+                    topUpValue,
+                    balanceWithdrawlTransactionId,
+                    topUpTransactionId));
+
+                return Result<Guid>.Error(updateTopUpTransactionResult.ErrorMessage!);
             }
 
-            // todo: here we can publish an event in a queue to accountWebService set your transaction to Ok and to this service to set transaction status to success
-            return Result<Guid>.Ok(transactionId);
+            return Result<Guid>.Ok(topUpTransactionId);
         }
 
         private async Task<Result<Tuple<Guid,decimal>>> CreatePendingTopUpTransaction(TopUpRequest request, UserResponse? fakeUser)
         {
-            var topUpBeneficiaryResult = await _beneficiaryRepository.GetTopUpBeneficiaryById(request.BeneficiaryId);
+            var userId = fakeUser!.UserId;
+            var isUserVerified = fakeUser.IsVerified;
+            var beneficiaryId = request.BeneficiaryId;
+            var topUpOptionId = request.TopOptionId;
 
-            if (topUpBeneficiaryResult.HasError)  // todo: LOG
-                return Result<Tuple<Guid, decimal>>.Error(topUpBeneficiaryResult.ErrorMessage!);
+            var userAndbeneficiaryRelationship =  await CheckTheRelationshipBetweenUserAndBeneficiary(userId, beneficiaryId);
+            if(userAndbeneficiaryRelationship.HasError) // todo: put some log here
+                return Result<Tuple<Guid, decimal>>.Error(userAndbeneficiaryRelationship.ErrorMessage!);
 
-            var topUpOptionResult = await _topUpOptionRepository.GetTopUpOptionById(request.TopOptionId);
-
-            if (topUpOptionResult.HasError)  // todo: LOG
+            var topUpOptionResult = await _topUpOptionRepository.GetTopUpOptionById(topUpOptionId);
+            if (topUpOptionResult.HasError)  // todo: put some log here
                 return Result<Tuple<Guid, decimal>>.Error(topUpOptionResult.ErrorMessage!);
-
             var topUpValue = topUpOptionResult.Data!.Value;
 
-            var transactionsOfTheMonthResult = await GetTopUpTransactionsOfTheMonth(fakeUser!);
-
-            if (transactionsOfTheMonthResult!.HasError)  // todo: LOG
+            var transactionsOfTheMonthResult = await GetTopUpTransactionsOfTheMonthByUserId(userId);
+            if (transactionsOfTheMonthResult!.HasError)  // todo: put some log here
                 return Result<Tuple<Guid, decimal>>.Error(transactionsOfTheMonthResult.ErrorMessage!);
+            var topUpTransactionsOfTheMonth = transactionsOfTheMonthResult.Data!;
 
-            var totalAmountForTheMonthPerBeneficiary = GetTotalAmountForTheMonthForThisBeneficiary(request.BeneficiaryId, transactionsOfTheMonthResult);
-            var totalAmountForTheMonth = GetTotalAmountForTheMonth(transactionsOfTheMonthResult);
+            var totalAmountForTheMonthForThisBeneficiary = GetTotalTopUpAmountForTheMonthByBeneficiaryId(beneficiaryId, topUpTransactionsOfTheMonth);
+            var totalAmountForTheMonth = GetTotalTopUpAmountForTheMonth(topUpTransactionsOfTheMonth);
 
-            if (TopUpRules.HasTheUserReachedTheTopUpLimitThisMonth(totalAmountForTheMonth!.Value, topUpValue))
+            if (TopUpRules.HasTheUserReachedTheTopUpLimitThisMonth(totalAmountForTheMonth, topUpValue)) // todo: put some log here
                 return Result<Tuple<Guid, decimal>>.Error("User have reached the top-up limit this month.");
 
-            if (TopUpRules.HasTheUserReachedTheTopUpLimitThisMonthForThisBeneficiary(totalAmountForTheMonthPerBeneficiary!.Value, topUpValue, fakeUser.IsVerified))
+            if (TopUpRules.HasTheUserReachedTheTopUpLimitThisMonthForThisBeneficiary(totalAmountForTheMonthForThisBeneficiary, topUpValue, isUserVerified)) // todo: put some log here
                 return Result<Tuple<Guid, decimal>>.Error("User have reached the top-up limit for this beneficiary this month.");
 
-            var pendingTransaction = TopUpTransaction.NewPendingTransaction(fakeUser.UserId,
-                topUpBeneficiaryResult.Data!.Id,
-                topUpOptionResult.Data.Value);
-
-            var createTransactionResult = await _topUpTransactionRepository.CreateTopUpTransaction(pendingTransaction);
-
-            if (createTransactionResult.HasError)
+            var pendingTransactionObj = TopUpTransaction.NewPendingTransaction(userId, beneficiaryId, topUpValue, TopUpRules.TopUpTransactionCharge);
+            var createPendingTransactionResult = await _topUpTransactionRepository.CreateTopUpTransactionAsync(pendingTransactionObj);
+            if (createPendingTransactionResult.HasError) // todo: put some log here
                 return Result<Tuple<Guid, decimal>>.Error("We have a problem creating the top-up transaction");
+            var pendingTopUpTransactionId = createPendingTransactionResult.Data;
 
-            return Result<Tuple<Guid, decimal>>.Ok(Tuple.Create(createTransactionResult.Data, topUpValue));
+            return Result<Tuple<Guid, decimal>>.Ok(Tuple.Create(pendingTopUpTransactionId, topUpValue));
         }
 
-        private static decimal? GetTotalAmountForTheMonth(Result<List<TopUpTransaction>>? transactionsOfTheMonthResult)
+        private async Task<Result<bool>> CheckTheRelationshipBetweenUserAndBeneficiary(Guid userId, Guid beneficiaryId)
         {
-            return transactionsOfTheMonthResult?.Data?
+            var topUpBeneficiaryListResult = await _beneficiaryRepository
+                .ListTopUpBeneficiariesAsync(x => x.UserId == userId && x.Id == beneficiaryId);
+
+            if (topUpBeneficiaryListResult.HasError || topUpBeneficiaryListResult.Data!.Count <= 0) // todo: put some log here
+                return Result<bool>.Error("It was not possible retrieve this beneficiary or user doesn't have relationship with this beneficiary.");
+
+            return Result<bool>.Ok(true);
+        }
+
+        private static decimal GetTotalTopUpAmountForTheMonth(List<TopUpTransaction> transactionsOfTheMontht)
+        {
+            return transactionsOfTheMontht
                 .Where(x => x.Status == TopUpTransactionStatus.Success)
                 .Sum(x => x.Amount);
         }
 
-        private static decimal? GetTotalAmountForTheMonthForThisBeneficiary(Guid beneficiaryId, Result<List<TopUpTransaction>>? transactionsOfTheMonthResult)
+        private static decimal GetTotalTopUpAmountForTheMonthByBeneficiaryId(Guid beneficiaryId, List<TopUpTransaction> topUpTransactionsOfTheMonth)
         {
-            return transactionsOfTheMonthResult?.Data?
+            return topUpTransactionsOfTheMonth
                 .Where(x => x.TopUpBeneficiaryId == beneficiaryId && x.Status == TopUpTransactionStatus.Success)
                 .Sum(x => x.Amount);
         }
 
-        private async Task<Result<List<TopUpTransaction>>?> GetTopUpTransactionsOfTheMonth(UserResponse fakeUser)
+        private async Task<Result<List<TopUpTransaction>>?> GetTopUpTransactionsOfTheMonthByUserId(Guid userId)
         {
             var now = _dateTimeExtensions.NowUtc();
             var firstDateOfTheMonth = _dateTimeExtensions.NewDateUtc(new DateTime(now.Year, now.Month, 1));
 
             return await _topUpTransactionRepository
-                .ListTopUpTransactionsByUserIdWithinAPeriod(fakeUser!.UserId, firstDateOfTheMonth, now);
+                .ListTopUpTransactionsByUserIdWithinAPeriodAsync(userId, firstDateOfTheMonth, now);
         }
 
         // this validation can be called into some middleware
@@ -182,10 +204,10 @@ namespace Backend.TopUp.Application.Services
         {
             var fakeUserExistsResult = _userWebService.FakeUserExists(userId);
 
-            if (fakeUserExistsResult.HasError) // todo: LOG
+            if (fakeUserExistsResult.HasError) // todo: put some log here
                 return Result<bool>.Error("Some error happened calling user service");
 
-            if (!fakeUserExistsResult.Data) // todo: LOG
+            if (!fakeUserExistsResult.Data) // todo: put some log here
                 return Result<bool>.Error("User doesn't exists");
 
             return Result<bool>.Ok(true);
@@ -194,7 +216,7 @@ namespace Backend.TopUp.Application.Services
         {
             var fakeUserResult = _userWebService.GetFakeUser(userId);
 
-            if (fakeUserResult.HasError) // todo: LOG
+            if (fakeUserResult.HasError) // todo: put some log here
                 return Result<UserResponse>.Error(fakeUserResult.ErrorMessage!);
 
             return Result<UserResponse>.Ok(fakeUserResult.Data!);

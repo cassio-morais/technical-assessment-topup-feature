@@ -28,7 +28,7 @@ namespace Backend.TopUp.Infrastructure.Repositories
             }
             catch (Exception ex)
             {
-                // todo: LOG
+                // todo: put some log here
                 return Result<TopUpOption>.Error("An error ocurred");
             }
         }
@@ -44,7 +44,7 @@ namespace Backend.TopUp.Infrastructure.Repositories
             }
             catch (Exception ex)
             {
-                // todo: LOG
+                // todo: put some log here
                 return Result<List<TopUpOption>>.Error("An error ocurred");
             }
         }

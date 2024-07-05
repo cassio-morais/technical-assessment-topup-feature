@@ -8,7 +8,9 @@ namespace Backend.TopUp.Infrastructure.Configuration.Db
     {
         public DbSet<TopUpBeneficiary> TopUpBeneficiaries { get; set; }
         public DbSet<TopUpTransaction> TopUpTransactions { get; set; }
+        public DbSet<TopUpOption> TopUpOptions { get; set; }
 
+        // we can split all these entity configurations below in separated configuration files
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TopUpBeneficiary>(builder =>
@@ -34,6 +36,7 @@ namespace Backend.TopUp.Infrastructure.Configuration.Db
                 builder.HasIndex(x => x.UserId);
                 builder.HasOne(x => x.ToUpBeneficiary);
                 builder.Property(x => x.Amount).HasColumnName("amount").HasDefaultValue((decimal)0);
+                builder.Property(x => x.TransactionCost).HasColumnName("transaction_cost").HasDefaultValue((decimal)0);
                 builder.Property(x => x.TransactionDate).HasColumnName("transaction_date").ValueGeneratedOnAdd().IsRequired();
                 builder.Property(x => x.TopUpBeneficiaryId).HasColumnName("top_up_beneficiary_id").IsRequired();
                 builder.Property(x => x.Status).HasColumnName("status").HasDefaultValue(TopUpTransactionStatus.Pending).IsRequired();

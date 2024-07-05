@@ -23,7 +23,7 @@ namespace Backend.TopUp.Infrastructure.Repository
             }
             catch (Exception ex)
             {
-                // todo: LOG
+                // todo: put some log here
                 return Result<Guid>.Error("An error ocurred");
             }
         }
@@ -40,7 +40,7 @@ namespace Backend.TopUp.Infrastructure.Repository
             }
             catch (Exception ex)
             {
-                // todo: LOG
+                // todo: put some log here
                 return Result<bool>.Error("An error ocurred");
             }
         }
@@ -60,7 +60,7 @@ namespace Backend.TopUp.Infrastructure.Repository
             catch (Exception ex)
             {
 
-                // todo: LOG
+                // todo: put some log here
                 return Result<List<TopUpBeneficiary>>.Error("An error ocurred");
             }
         }
@@ -81,7 +81,7 @@ namespace Backend.TopUp.Infrastructure.Repository
             }
             catch (Exception ex)
             {
-                // todo: LOG
+                // todo: put some log here
                 return Result<TopUpBeneficiary>.Error("An error ocurred");
             }
         }

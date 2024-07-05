@@ -10,26 +10,24 @@ namespace Backend.TopUp.Core.Application
         private const decimal MonthlyTopUpLimitPerUnverifiedUserPerBeneficiary = 500;
         private const decimal MonthlyTopUpLimitPerVerifiedUserPerBeneficiary = 1000;
         private const decimal MonthlyTopUpLimit = 3000;
-        private const decimal TopUpTransactionCharge = 1;
+        public const decimal TopUpTransactionCharge = 1;
 
         public static bool HasTheUserReachedTheTopUpLimitThisMonthForThisBeneficiary(decimal totalAmountForTheMonthPerBeneficiary, decimal topUpValue, bool isUserVerified) 
         {
-            var transactionTotalCost = topUpValue + TopUpTransactionCharge;
-
             if (isUserVerified)
             {
                 //If a user is verified, they can top up a maximum of AED 1, 000 per calendar month per
                 //beneficiary.
-                if (totalAmountForTheMonthPerBeneficiary + transactionTotalCost > MonthlyTopUpLimitPerVerifiedUserPerBeneficiary)
+                if (totalAmountForTheMonthPerBeneficiary + topUpValue > MonthlyTopUpLimitPerVerifiedUserPerBeneficiary)
                     return true;
             }
             else
             {
                 //If a user is not verified, they can top up a maximum of AED 500 per calendar month per
                 //beneficiary for security reasons.
-                if (totalAmountForTheMonthPerBeneficiary + transactionTotalCost > MonthlyTopUpLimitPerUnverifiedUserPerBeneficiary)
+                if (totalAmountForTheMonthPerBeneficiary + topUpValue > MonthlyTopUpLimitPerUnverifiedUserPerBeneficiary)
                     return true;
-                    //return Result<Tuple<Guid, decimal>>.Error("User have reached the top-up limit for this beneficiary this month");
+                    
             }
 
             return false;
@@ -37,9 +35,7 @@ namespace Backend.TopUp.Core.Application
 
         public static bool HasTheUserReachedTheTopUpLimitThisMonth(decimal totalAmountForTheMonth, decimal topUpValue) 
         {
-            var transactionTotalCost = topUpValue + TopUpTransactionCharge;
-
-            if (totalAmountForTheMonth + transactionTotalCost > MonthlyTopUpLimit)
+            if (totalAmountForTheMonth + topUpValue > MonthlyTopUpLimit)
                 return true;
 
             return false;
