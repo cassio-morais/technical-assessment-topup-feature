@@ -37,11 +37,11 @@ namespace Backend.TopUp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddBeneficiaryAsync([Required] Guid userId, [FromBody] AddBeneficiaryRequest request)
         {
-            var result = await _topUpService.AddTopUpBeneficiaryAsync(userId,request);
+            var result = await _topUpService.AddTopUpBeneficiaryAsync(userId, request);
 
             if (result.HasError)
                 return BadRequest(new ProblemDetails() { Title = result.ErrorMessage });
-            
+
             return NoContent();
         }
 
@@ -55,7 +55,7 @@ namespace Backend.TopUp.Api.Controllers
         /// <param name="userId">User Id [real world this information could be retrieved from a JWT token]</param>
         /// <response code="204"> </response>
         [HttpGet("users/{userId}/beneficiaries")]
-        [ProducesResponseType(typeof(TopUpBeneficiaryResponse),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(TopUpBeneficiaryResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ListBeneficiariesAsync([Required] Guid userId)
         {

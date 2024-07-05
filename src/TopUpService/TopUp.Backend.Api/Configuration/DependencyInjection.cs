@@ -4,30 +4,30 @@ using Backend.TopUp.Core.Extensions;
 using Backend.TopUp.Core.Infrastruture.Configuration;
 using Backend.TopUp.Core.Infrastruture.Repositories;
 using Backend.TopUp.Core.Infrastruture.WebServices;
+using Backend.TopUp.Core.Messages;
 using Backend.TopUp.Infrastructure.Configuration.Db;
 using Backend.TopUp.Infrastructure.Repositories;
 using Backend.TopUp.Infrastructure.Repository;
 using Backend.TopUp.Infrastructure.WebServices;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
-using Refit;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.EntityFrameworkCore;
 using MassTransit;
-using Backend.TopUp.Core.Messages;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
+using Refit;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 namespace Backend.TopUp.Api.Configuration
 {
     public static class DependencyInjection
     {
         // todo: split all this configuration in separeted D.I. extension classes like this
-        public static IServiceCollection AddCustomDependencyInjection(this IServiceCollection services, IConfiguration configuration) 
-        {          
-            services.AddDbContext<DatabaseContext>(options => 
+        public static IServiceCollection AddCustomDependencyInjection(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<DatabaseContext>(options =>
                 options.UseNpgsql(GetFromEnvOrConfig("CONNECTION_STRING", "ConnectionStrings:postgres", configuration)));
 
             services.AddRouting(opt => opt.LowercaseUrls = true);
@@ -49,7 +49,7 @@ namespace Backend.TopUp.Api.Configuration
             {
                 c.BaseAddress = new Uri(
                     GetFromEnvOrConfig("ACCOUNT_API_BASE_ADDRESS", "accountApi:baseAddress", configuration) + ":" + GetFromEnvOrConfig("ACCOUNT_API_PORT", "accountApi:port", configuration));
-                
+
             });
 
             services.ConfigureOptions<ConfigureSwaggerOptions>();
@@ -105,11 +105,12 @@ namespace Backend.TopUp.Api.Configuration
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host(GetFromEnvOrConfig("RABBIT_MQ_HOST", "rabbitmq:host", configuration), "/", 
-                        h => {
+                    cfg.Host(GetFromEnvOrConfig("RABBIT_MQ_HOST", "rabbitmq:host", configuration), "/",
+                        h =>
+                        {
                             h.Username(GetFromEnvOrConfig("RABBIT_MQ_USER", "rabbitmq:user", configuration));
                             h.Password(GetFromEnvOrConfig("RABBIT_MQ_PASS", "rabbitmq:pass", configuration));
-                    });
+                        });
 
                     cfg.Message<TopUpTransactionFailed>(x => x.SetEntityName("topup:transaction:failed"));
 

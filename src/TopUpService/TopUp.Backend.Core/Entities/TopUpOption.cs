@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Backend.TopUp.Core.Entities
+﻿namespace Backend.TopUp.Core.Entities
 {
     public class TopUpOption : BaseEntity<Guid>
     {
@@ -29,7 +27,7 @@ namespace Backend.TopUp.Core.Entities
             }
         }
         private decimal _value;
-        public decimal Value 
+        public decimal Value
         {
             get
             {

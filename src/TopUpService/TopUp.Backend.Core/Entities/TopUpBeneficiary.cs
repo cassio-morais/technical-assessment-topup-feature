@@ -4,7 +4,7 @@ namespace Backend.TopUp.Core.Entities
 {
     public sealed class TopUpBeneficiary : BaseEntity<Guid>
     {
-        public TopUpBeneficiary(Guid userId, string? nickname, string? phoneNumber, bool isActive) 
+        public TopUpBeneficiary(Guid userId, string? nickname, string? phoneNumber, bool isActive)
             : base(DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc), null)
         {
             UserId = userId;
@@ -43,7 +43,7 @@ namespace Backend.TopUp.Core.Entities
             private set
             {
                 if (!IsValidUAEPhoneNumber(value))
-                    throw new Exception("Invalid UAE phone number"); 
+                    throw new Exception("Invalid UAE phone number");
 
                 _phoneNumber = value;
             }

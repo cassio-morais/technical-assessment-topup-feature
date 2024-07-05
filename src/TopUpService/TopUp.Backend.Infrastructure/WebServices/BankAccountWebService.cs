@@ -26,7 +26,7 @@ namespace Backend.TopUp.Infrastructure.WebServices
     // Using refit just for simplicity...
     // in real world many others conditions need to be analyzed to choose the http/rest lib...
     // Moreover, retry policies are welcome.
-    public interface IBankAccountApi 
+    public interface IBankAccountApi
     {
         [Post("/api/v1/Account/balance/withdrawl")]
         Task<HttpResponseMessage> WithdrawBalanceAsync(BalanceWithdrawlRequest request);

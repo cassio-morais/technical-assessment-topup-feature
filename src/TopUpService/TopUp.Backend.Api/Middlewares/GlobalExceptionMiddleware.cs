@@ -12,7 +12,7 @@ namespace Backend.TopUp.Api.Middlewares
             _logger = logger;
         }
 
-        public async Task Invoke(HttpContext httpContext) 
+        public async Task Invoke(HttpContext httpContext)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace Backend.TopUp.Api.Middlewares
         }
     }
 
-    public static class GlobalExceptionMiddlewareBuilder 
+    public static class GlobalExceptionMiddlewareBuilder
     {
         public static IApplicationBuilder UseGlobalExceptionMiddleware(this IApplicationBuilder builder)
                 => builder.UseMiddleware<GlobalExceptionMiddleware>();

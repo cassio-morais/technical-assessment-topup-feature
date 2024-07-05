@@ -26,7 +26,7 @@ namespace Backend.TopUp.Application.Services
         private readonly IBus _bus;
 
         public TopUpService(
-            ITopUpBeneficiaryRepository topUpBeneficiaryRepository, 
+            ITopUpBeneficiaryRepository topUpBeneficiaryRepository,
             ITopUpOptionRepository topUpOptionRepository,
             ITopUpTransactionRepository topUpTransactionRepository,
             IUserWebService userWebService,
@@ -88,7 +88,7 @@ namespace Backend.TopUp.Application.Services
                 return Result<List<TopUpOption>>.Error("Currency abbreviation value required");
 
             var result = await _topUpOptionRepository.ListTopUpOptionsAsync(x => x.IsActive && x.CurrencyAbbreviation == currencyAbbreviation);
-            if(!result.Data!.Any()) // todo: put some log here
+            if (!result.Data!.Any()) // todo: put some log here
                 return Result<List<TopUpOption>>.Error("Currency abbreviation doesn't exist");
 
             return result;
@@ -136,15 +136,15 @@ namespace Backend.TopUp.Application.Services
             return Result<Guid>.Ok(topUpTransactionId);
         }
 
-        private async Task<Result<Tuple<Guid,decimal>>> CreatePendingTopUpTransaction(TopUpRequest request, UserResponse? fakeUser)
+        private async Task<Result<Tuple<Guid, decimal>>> CreatePendingTopUpTransaction(TopUpRequest request, UserResponse? fakeUser)
         {
             var userId = fakeUser!.UserId;
             var isUserVerified = fakeUser.IsVerified;
             var beneficiaryId = request.BeneficiaryId;
             var topUpOptionId = request.TopOptionId;
 
-            var userAndbeneficiaryRelationship =  await CheckTheRelationshipBetweenUserAndBeneficiary(userId, beneficiaryId);
-            if(userAndbeneficiaryRelationship.HasError) // todo: put some log here
+            var userAndbeneficiaryRelationship = await CheckTheRelationshipBetweenUserAndBeneficiary(userId, beneficiaryId);
+            if (userAndbeneficiaryRelationship.HasError) // todo: put some log here
                 return Result<Tuple<Guid, decimal>>.Error(userAndbeneficiaryRelationship.ErrorMessage!);
 
             var topUpOptionResult = await _topUpOptionRepository.GetTopUpOptionById(topUpOptionId);

@@ -15,7 +15,7 @@ namespace Backend.TopUp.Infrastructure.Repositories
         {
             try
             {
-                var  result = await _transactions.AddAsync(topUpTransaction);
+                var result = await _transactions.AddAsync(topUpTransaction);
                 await _context.SaveChangesAsync();
 
                 return Result<Guid>.Ok(result.Entity.Id);
@@ -31,10 +31,10 @@ namespace Backend.TopUp.Infrastructure.Repositories
         {
             try
             {
-                 return Result<List<TopUpTransaction>>.Ok(await _transactions
-                    .AsNoTracking()
-                    .Where(x => x.TransactionDate >= startDate && x.TransactionDate <= endDate)
-                    .ToListAsync());
+                return Result<List<TopUpTransaction>>.Ok(await _transactions
+                   .AsNoTracking()
+                   .Where(x => x.TransactionDate >= startDate && x.TransactionDate <= endDate)
+                   .ToListAsync());
             }
             catch (Exception ex)
             {
@@ -43,7 +43,7 @@ namespace Backend.TopUp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<Guid>> UpdateTopUpTransactionStatusAsync(Guid topUpTransactionId,TopUpTransactionStatus topUpTransactionStatus, string? reason = null)
+        public async Task<Result<Guid>> UpdateTopUpTransactionStatusAsync(Guid topUpTransactionId, TopUpTransactionStatus topUpTransactionStatus, string? reason = null)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Backend.TopUp.Infrastructure.Repositories
                     return Result<Guid>.Error("An error ocurred");
 
                 transaction.UpdateStatus(topUpTransactionStatus, reason);
-                
+
                 _transactions.Update(transaction);
                 await _context.SaveChangesAsync();
 

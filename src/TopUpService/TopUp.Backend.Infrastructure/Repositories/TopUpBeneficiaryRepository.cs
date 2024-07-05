@@ -76,7 +76,7 @@ namespace Backend.TopUp.Infrastructure.Repository
                 if (result is null)
                     return Result<TopUpBeneficiary>.Error("Beneficiary doesn't exist");
 
-               return Result<TopUpBeneficiary>.Ok(result);
+                return Result<TopUpBeneficiary>.Ok(result);
 
             }
             catch (Exception ex)

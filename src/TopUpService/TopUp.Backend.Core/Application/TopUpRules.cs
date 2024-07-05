@@ -10,7 +10,7 @@
         private const decimal MonthlyTopUpLimit = 3000;
         public const decimal TopUpTransactionCharge = 1;
 
-        public static bool HasTheUserReachedTheTopUpLimitThisMonthForThisBeneficiary(decimal totalAmountForTheMonthPerBeneficiary, decimal topUpValue, bool isUserVerified) 
+        public static bool HasTheUserReachedTheTopUpLimitThisMonthForThisBeneficiary(decimal totalAmountForTheMonthPerBeneficiary, decimal topUpValue, bool isUserVerified)
         {
             if (isUserVerified)
             {
@@ -25,13 +25,13 @@
                 //beneficiary for security reasons.
                 if (totalAmountForTheMonthPerBeneficiary + topUpValue > MonthlyTopUpLimitPerUnverifiedUserPerBeneficiary)
                     return true;
-                    
+
             }
 
             return false;
         }
 
-        public static bool HasTheUserReachedTheTopUpLimitThisMonth(decimal totalAmountForTheMonth, decimal topUpValue) 
+        public static bool HasTheUserReachedTheTopUpLimitThisMonth(decimal totalAmountForTheMonth, decimal topUpValue)
         {
             if (totalAmountForTheMonth + topUpValue > MonthlyTopUpLimit)
                 return true;

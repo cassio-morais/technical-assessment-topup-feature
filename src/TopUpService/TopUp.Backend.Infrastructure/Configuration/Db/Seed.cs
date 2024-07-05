@@ -13,7 +13,7 @@ namespace Backend.TopUp.Infrastructure.Configuration.Db
             {
                 var serviceScopeFactory = app.Services.GetService<IServiceScopeFactory>();
 
-                if (serviceScopeFactory is null) 
+                if (serviceScopeFactory is null)
                     throw new NullReferenceException();
 
                 using var serviceScope = serviceScopeFactory.CreateScope();
@@ -22,7 +22,7 @@ namespace Backend.TopUp.Infrastructure.Configuration.Db
                 dbContext.Database.Migrate();
 
                 // DONT USE THIS IN PRODUCTION
-                if (!dbContext.TopUpOptions.Any(x => x.CurrencyAbbreviation == "AED")) 
+                if (!dbContext.TopUpOptions.Any(x => x.CurrencyAbbreviation == "AED"))
                 {
                     dbContext.TopUpOptions.AddRange(_aedTopUpOptionsSeed);
                     dbContext.SaveChanges();
@@ -41,8 +41,8 @@ namespace Backend.TopUp.Infrastructure.Configuration.Db
 
         private static List<TopUpOption> _aedTopUpOptionsSeed
         {
-            get 
-            {  
+            get
+            {
                 return [new("AED", 5, true),
                         new("AED", 10, true),
                         new("AED", 20, true),
@@ -51,6 +51,6 @@ namespace Backend.TopUp.Infrastructure.Configuration.Db
                         new("AED", 75, true),
                         new("AED", 100, true)];
             }
-        } 
+        }
     }
 }

@@ -21,5 +21,5 @@ namespace Backend.TopUp.Infrastructure.WebServices
 
             return Result<UserResponse>.Ok(new UserResponse(user.UserId, user.IsVerified));
         }
-    } 
+    }
 }

@@ -148,7 +148,7 @@ public class TopUpServiceTests
         _topUpTransactionRepositoryMock.Setup(x =>
                 x.ListTopUpTransactionsByUserIdWithinAPeriodAsync(It.IsAny<Guid>(), It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
                     .ReturnsAsync(Result<List<TopUpTransaction>>
-                        .Ok(new List<TopUpTransaction> { new(userId, It.IsAny<Guid>(), 10, It.IsAny<DateTimeOffset>(), 1)}));
+                        .Ok(new List<TopUpTransaction> { new(userId, It.IsAny<Guid>(), 10, It.IsAny<DateTimeOffset>(), 1) }));
 
         _topUpTransactionRepositoryMock.Setup(x => x.CreateTopUpTransactionAsync(It.IsAny<TopUpTransaction>()))
             .ReturnsAsync(Result<Guid>.Ok(Guid.NewGuid()));

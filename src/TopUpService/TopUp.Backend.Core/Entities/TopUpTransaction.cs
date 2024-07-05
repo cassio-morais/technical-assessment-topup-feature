@@ -12,9 +12,9 @@
             TransactionCost = transactionCost;
         }
 
-        public static TopUpTransaction NewPendingTransaction(Guid userId, Guid topUpBeneficiaryId, decimal amount, decimal transactionCost) 
+        public static TopUpTransaction NewPendingTransaction(Guid userId, Guid topUpBeneficiaryId, decimal amount, decimal transactionCost)
         {
-            return new TopUpTransaction(userId, topUpBeneficiaryId, amount, DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),transactionCost);
+            return new TopUpTransaction(userId, topUpBeneficiaryId, amount, DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc), transactionCost);
         }
 
         public Guid UserId { get; private set; }
@@ -28,7 +28,7 @@
 
         public const decimal TransactionCharge = 1;
 
-        public void UpdateStatus(TopUpTransactionStatus topUpTransactionStatus, string? reason = null) 
+        public void UpdateStatus(TopUpTransactionStatus topUpTransactionStatus, string? reason = null)
         {
             Status = topUpTransactionStatus;
             Reason = reason;
