@@ -25,7 +25,7 @@
 	- Distributed transactions (Saga Pattern or something)
 	- Distributed locks
 	- Commit and Rollback actions
- - Retry policies
+ 	- Retry policies
 	- Events
 	- Audit... etc
  - So... none of these challenges were addressed here. But I'm aware of them.
