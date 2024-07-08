@@ -26,8 +26,8 @@
 	- Distributed locks
 	- Commit and Rollback actions
  - Retry policies
-	- Events
-	- Audit
+ - Events
+ - Audit
  - Observability
  - So... none of these challenges were addressed here. But I'm aware of them.
 
