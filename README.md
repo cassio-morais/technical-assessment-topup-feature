@@ -22,12 +22,12 @@
  - In real world, solutions like this need more unit tests and integration tests.
  - There are comments in code (to explain some of my point of view about real world solutions)
  - There are so many challenges in a real world solution like these: 
-	- Distributed transactions (Saga Pattern or something)
-	- Distributed locks
-	- Commit and Rollback actions
- - Retry policies
- - Events
- - Audit
- - Observability
- - So... none of these challenges were addressed here. But I'm aware of them.
+	 - Distributed transactions (Saga Pattern or something)
+	 - Distributed locks
+	 - Commit and Rollback actions
+  - Retry policies
+  - Events
+  - Audit
+  - Observability
+  - So... none of these challenges were addressed here. But I'm aware of them.
 
